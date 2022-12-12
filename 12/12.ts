@@ -2,12 +2,9 @@ import fs from 'fs';
 
 const grid = fs.readFileSync('12/input.txt', 'utf8').split('\n').filter(Boolean);
 
-const part1 = (() => {
-    const startRow = grid.findIndex((row) => row.includes('S'));
-    const startCol = grid[startRow].indexOf('S');
-
-    const queue = [[startRow, startCol, 0]];
-    const visited = new Set([[startRow, startCol].join(',')]);
+const findShortestPathDistances = (row: number, col: number) => {
+    const queue = [[row, col, 0]];
+    const visited = new Set([[row, col].join(',')]);
 
     while (queue.length) {
         const [row, col, distance] = queue.shift()!;
@@ -47,4 +44,39 @@ const part1 = (() => {
             visited.add([nextRow, nextCol].join(','));
         }
     }
+
+    return null;
+};
+
+const part1 = (() => {
+    const startRow = grid.findIndex((row) => row.includes('S'));
+    const startCol = grid[startRow].indexOf('S');
+
+    return findShortestPathDistances(startRow, startCol);
+})();
+
+type Coordinate = [number, number];
+
+const part2 = (() => {
+    let shortestDistance = Infinity;
+
+    grid.reduce((lowPoints, row, rowIdx) => {
+        row.split('').forEach((col, colIdx) => {
+            if (['S', 'a'].includes(col)) {
+                lowPoints.push([rowIdx, colIdx]);
+            }
+        });
+
+        return lowPoints;
+    }, [] as Coordinate[]).forEach((lowPoint) => {
+        const distance = findShortestPathDistances(...lowPoint);
+
+        if (distance === null) {
+            return;
+        }
+
+        shortestDistance = Math.min(shortestDistance, distance);
+    });
+
+    return shortestDistance;
 })();
