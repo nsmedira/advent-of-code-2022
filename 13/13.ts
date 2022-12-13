@@ -52,15 +52,27 @@ const part1 = (() => {
 
     for (let i = 0; i < pairs.length; i++) {
         if (
-            getHasCorrectOrder(
-                ...(pairs[i].split('\n').map((string) => {
-                    return JSON.parse(string);
-                }) as [Packet, Packet])
-            ) === true
+            getHasCorrectOrder(...(pairs[i].split('\n').map((string) => JSON.parse(string)) as [Packet, Packet])) ===
+            true
         ) {
             indices.push(i + 1);
         }
     }
 
     return indices.reduce((sum, index) => sum + index, 0);
+})();
+
+const part2 = (() => {
+    const packets = input.split('\n').filter(Boolean);
+    packets.push('[[2]]', '[[6]]');
+
+    packets.sort((a, b) => {
+        if (getHasCorrectOrder(JSON.parse(a), JSON.parse(b)) === true) {
+            return -1;
+        }
+
+        return 1;
+    });
+
+    return (packets.indexOf('[[6]]') + 1) * (packets.indexOf('[[2]]') + 1);
 })();
