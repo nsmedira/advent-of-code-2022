@@ -2,12 +2,12 @@ import fs from 'fs';
 
 const paths = fs.readFileSync('14/input.txt', 'utf8').split('\n').filter(Boolean);
 
-const part1 = (() => {
-    enum CellMaterial {
-        Rock,
-        Sand
-    }
+enum CellMaterial {
+    Rock,
+    Sand
+}
 
+const generateMap = () => {
     const map = new Map<string, CellMaterial>();
     let maxY = 0;
 
@@ -29,6 +29,12 @@ const part1 = (() => {
             }
         }
     }
+
+    return [map, maxY] as const;
+};
+
+const part1 = (() => {
+    const [map, maxY] = generateMap();
 
     let isFlowingIntoAbyss = false;
     let unitsAtRest = 0;
@@ -65,6 +71,55 @@ const part1 = (() => {
 
         map.set(`${sandPosition[0]},${sandPosition[1]}`, CellMaterial.Sand);
         unitsAtRest++;
+    }
+
+    return unitsAtRest;
+})();
+
+const part2 = (() => {
+    const [map, maxY] = generateMap();
+
+    let unitsAtRest = 0;
+    let isSourceBlocked = false;
+
+    while (!isSourceBlocked) {
+        const sandPosition = [500, 0];
+        let isAtRest = false;
+
+        while (!isAtRest) {
+            if (sandPosition[1] === maxY + 1) {
+                isAtRest = true;
+                continue;
+            }
+
+            if (map.get(`${sandPosition[0]},${sandPosition[1] + 1}`) === undefined) {
+                sandPosition[1]++;
+                continue;
+            }
+
+            if (map.get(`${sandPosition[0] - 1},${sandPosition[1] + 1}`) === undefined) {
+                sandPosition[0]--;
+                sandPosition[1]++;
+                continue;
+            }
+
+            if (map.get(`${sandPosition[0] + 1},${sandPosition[1] + 1}`) === undefined) {
+                sandPosition[0]++;
+                sandPosition[1]++;
+                continue;
+            }
+
+            isAtRest = true;
+        }
+
+        unitsAtRest++;
+
+        if (sandPosition[0] === 500 && sandPosition[1] === 0) {
+            isSourceBlocked = true;
+            continue;
+        }
+
+        map.set(`${sandPosition[0]},${sandPosition[1]}`, CellMaterial.Sand);
     }
 
     return unitsAtRest;
